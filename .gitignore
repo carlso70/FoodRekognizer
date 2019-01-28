@@ -82,3 +82,6 @@ typings/
 # Photos uploaded
 uploads/* 
 out.jpg
+
+# Annoying mac files
+.DS_Store
