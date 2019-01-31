@@ -13,11 +13,19 @@ app.use(cors({ credentials: true, origin: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+/* Name of the s3 bucket we will use to store photos for label detection */
+let bucketName;
+s3.getFoodBucket().then(result => bucketName = result).catch(err => {
+    console.error(err);
+    /* Kill the app because there is no s3 bucket */
+    throw new Error("NO S3 BUCKET TO RUN");
+});
+
+
 /* 
  *  Upload a photo, and detect labels in it
  */
-
-var storage = multer.diskStorage({
+let storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, './uploads/')
     },
@@ -27,11 +35,22 @@ var storage = multer.diskStorage({
         });
     }
 });
-var upload = multer({ storage: storage });
+let upload = multer({ storage: storage });
 app.post('/detectPhotoLabels', upload.single('photo'), (req, res) => {
     console.log(req.file); /* holds the file */
     console.log(req.body); /* holds the body if there is one */
-    photoUtils.convertHEICtoPNG(req.file.path);
+    /* Convert given photo */
+    photoUtils.convertHEICtoPNG(req.file.path)
+        .then(outputFile => {
+            /* Upload converted png to s3 bucket */
+
+            /* Delete photo from local file system */
+
+            /* Detect the labels of the photo */
+
+            /* Respond with the labels of the photo */
+
+        });
     res.sendStatus(200);
 });
 
