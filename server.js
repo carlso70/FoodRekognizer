@@ -15,7 +15,10 @@ app.use(bodyParser.json());
 
 /* Name of the s3 bucket we will use to store photos for label detection */
 let bucketName;
-s3.getFoodBucket().then(result => bucketName = result).catch(err => {
+s3.getFoodBucket().then(result => {
+    bucketName = result;
+    console.log(`Bucketname: ${bucketName}`);
+}).catch(err => {
     console.error(err);
     /* Kill the app because there is no s3 bucket */
     throw new Error("NO S3 BUCKET TO RUN");
@@ -39,19 +42,26 @@ let upload = multer({ storage: storage });
 app.post('/detectPhotoLabels', upload.single('photo'), (req, res) => {
     console.log(req.file); /* holds the file */
     console.log(req.body); /* holds the body if there is one */
+
     /* Convert given photo */
     photoUtils.convertHEICtoPNG(req.file.path)
         .then(outputFile => {
+            console.log(`Converted file: ${outputFile}`);
+
             /* Upload converted png to s3 bucket */
+            s3.uploadPhotoToBucket(bucketName, req.file.originalname, outputFile)
+                .then(keyName => {
+                    console.log(`File uploaded: ${keyName}`);
+                    /* TODO Delete photo from local file system */
 
-            /* Delete photo from local file system */
-
-            /* Detect the labels of the photo */
-
-            /* Respond with the labels of the photo */
-
+                    /* Detect the labels of the photo */
+                    rekognition.detectLabels(bucketName, keyName).then(labels => {
+                        /* Respond with the labels of the photo */
+                        res.send(labels);
+                    });
+                })
+                .catch(err => console.error(err))
         });
-    res.sendStatus(200);
 });
 
 // Listen to the App Engine-specified port, or 8080 otherwise

@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk'),
+	fs = require('fs'),
 	uuid = require('uuid');
 
 AWS.config.update({ region: 'us-east-1' });
@@ -7,17 +8,21 @@ let s3 = new AWS.S3();
 module.exports = {
 
 	/* Get food bucket for storing photos, if there isn't one, create one */
-	getFoodBucket: async () => {
-		const buckets = await this.listBuckets();
-		/* Return the bucket with the food identifier if it exist */
-		for (const bucket of buckets) {
-			if (bucket.Name.indexOf('food') > -1) return bucket.Name;
-		}
+	getFoodBucket: () => {
+		return new Promise((resolve, reject) => {
+			s3.listBuckets((err, data) => {
+				/* Return the bucket with the food identifier if it exist */
+				for (const bucket of data.Buckets) {
+					if (bucket.Name.indexOf('food') > -1) resolve(bucket.Name);
+				}
 
-		/* Create a new food bucket and return the name since once doesn't exist*/
-		const bucketName = 'food' + uuid.v4();
-		await this.createBucket(bucketName);
-		return bucketName;
+				/* Create a new food bucket and return the name since once doesn't exist*/
+				const bucketName = 'food' + uuid.v4();
+				let bucket = s3.createBucket({ Bucket: bucketName }).promise();
+				bucket.then(resolve(bucketName))
+					.catch(err => reject(err));
+			});
+		});
 	},
 
 	/* Create a new S3 bucket to work with using the given name*/
@@ -77,4 +82,25 @@ module.exports = {
 			}
 		}).catch(err => console.error(err));
 	},
+
+	uploadPhotoToBucket: (bucketName, keyName, photoLocation) => {
+		return new Promise((resolve, reject) => {
+			// Create params for putObject call
+			let objectParams = {
+				Bucket: bucketName,
+				Key: keyName,
+				Body: fs.createReadStream(photoLocation)
+			};
+			/* Create and upload object into bucket */
+			var uploadPromise = new AWS.S3().putObject(objectParams).promise();
+			uploadPromise.then((data) => {
+				console.log("Successfully uploaded data to " + bucketName + "/" + keyName);
+				resolve(keyName);
+			}).catch((err) => {
+				// console.error(err, err.stack);
+				console.log("In test upload to photo");
+				reject(err);
+			});
+		});
+	}
 }
