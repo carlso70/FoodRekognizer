@@ -16,6 +16,7 @@ module.exports = {
 
         Promise.all(promises).then(res => {
             console.log(util.inspect(res, { showHidden: false, depth: null }));
+            
         });
     }
 };
