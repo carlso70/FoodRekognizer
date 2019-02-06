@@ -3,16 +3,16 @@ const rekognition = require('./AWS/rekognition.js'),
     foodDetection = require('./FoodDetection/foodDetection.js'),
     photoUtils = require('./Utils/photoUtils.js'),
     express = require('express'),
-    app = express(),
     crypto = require('crypto'),
     bodyParser = require('body-parser'),
     cors = require('cors'),
     mime = require('mime'),
-    multer = require('multer');
-
-app.use(cors({ credentials: true, origin: true }));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+    next = require('next'),
+    multer = require('multer'),
+    dev = process.env.NODE_ENV !== 'production',
+    app = next({ dev }),
+    handle = app.getRequestHandler(),
+    PORT = process.env.PORT || 8080;
 
 /* 
  * Name of the s3 bucket we will use to store photos for label detection,
@@ -29,9 +29,7 @@ s3.getFoodBucket().then(result => {
 });
 
 
-/* 
- *  Upload a photo, and detect labels in it
- */
+/* Define multer upload settings for multiform data */
 let storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, './uploads/')
@@ -43,76 +41,104 @@ let storage = multer.diskStorage({
     }
 });
 let upload = multer({ storage: storage });
-app.post('/detectPhotoLabels', upload.single('photo'), (req, res) => {
-    console.log(req.file); /* holds the file */
-    console.log(req.body); /* holds the body if there is one */
 
-    /* Convert given photo */
-    photoUtils.convertHEICtoPNG(req.file.path)
-        .then(outputFile => {
-            console.log(`Converted file: ${outputFile}`);
 
-            /* Upload converted png to s3 bucket */
-            s3.uploadPhotoToBucket(bucketName, req.file.originalname, outputFile)
-                .then(keyName => {
-                    console.log(`File uploaded: ${keyName}`);
-                    /* TODO Delete photo from local file system */
+app.prepare()
+    .then(() => {
+        const server = express()
+        server.use(cors({ credentials: true, origin: true }));
+        server.use(bodyParser.urlencoded({ extended: true }));
+        server.use(bodyParser.json());
 
-                    /* Detect the labels of the photo */
-                    rekognition.detectLabels(bucketName, keyName).then(labels => {
-                        /* Respond with the labels of the photo */
-                        res.send(labels);
-                    });
-                })
-                .catch(err => {
-                    console.error(err);
-                    res.sendStatus(500);
-                })
-        }).catch(err => {
-            console.error(err);
-            res.sendStatus(500);
+        server.get('*', (req, res) => {
+            return handle(req, res)
         });
-});
 
-app.post('/detectCalories', upload.single('photo'), (req, res) => {
-    /* Convert given photo */
-    photoUtils.convertHEICtoPNG(req.file.path)
-        .then(outputFile => {
-            console.log(`Converted file: ${outputFile}`);
+        /* 
+         *  Upload a photo, and detect labels in it
+         */
+        server.post('/api/detectPhotoLabels', upload.single('photo'), (req, res) => {
+            console.log(req.file); /* holds the file */
+            console.log(req.body); /* holds the body if there is one */
 
-            /* Upload converted png to s3 bucket */
-            s3.uploadPhotoToBucket(bucketName, req.file.originalname, outputFile)
-                .then(keyName => {
-                    console.log(`File uploaded: ${keyName}`);
-                    /* TODO Delete photo from local file system */
+            /* Convert given photo */
+            photoUtils.convertHEICtoPNG(req.file.path)
+                .then(outputFile => {
+                    console.log(`Converted file: ${outputFile}`);
 
-                    /* Detect the labels of the photo */
-                    rekognition.detectLabels(bucketName, keyName).then(labels => {
-                        if (labels.Labels) {
-                            /* Check the labels with the food database */
-                            foodDetection.parseLabelDataForFood(labels.Labels)
-                                .then(result => {
-                                    console.log(result)
-                                    res.send(result);
-                                })
-                                .catch(err => {
-                                    console.error(err);
-                                    res.sendStatus(500);
-                                });
-                        } else {
+                    /* Upload converted png to s3 bucket */
+                    s3.uploadPhotoToBucket(bucketName, req.file.originalname, outputFile)
+                        .then(keyName => {
+                            console.log(`File uploaded: ${keyName}`);
+                            /* TODO Delete photo from local file system */
+
+                            /* Detect the labels of the photo */
+                            rekognition.detectLabels(bucketName, keyName).then(labels => {
+                                /* Respond with the labels of the photo */
+                                res.send(labels);
+                            });
+                        })
+                        .catch(err => {
+                            console.error(err);
                             res.sendStatus(500);
-                        }
-                    });
-                })
-                .catch(err => {
+                        })
+                }).catch(err => {
                     console.error(err);
                     res.sendStatus(500);
-                })
+                });
         });
-});
+        /**************************** END DETECT PHOTO LABELS *************************************/
 
-/* Listen to the App Engine-specified port, or 8080 otherwise */
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}...`);
-});
+        /* 
+         * DETECT CALORIES - upload a picture, process it to s3, check labels using rekognition,
+         * then check for food and detect potential calories
+         */
+        server.post('/api/detectCalories', upload.single('photo'), (req, res) => {
+            /* Convert given photo */
+            photoUtils.convertHEICtoPNG(req.file.path)
+                .then(outputFile => {
+                    console.log(`Converted file: ${outputFile}`);
+
+                    /* Upload converted png to s3 bucket */
+                    s3.uploadPhotoToBucket(bucketName, req.file.originalname, outputFile)
+                        .then(keyName => {
+                            console.log(`File uploaded: ${keyName}`);
+                            /* TODO Delete photo from local file system */
+
+                            /* Detect the labels of the photo */
+                            rekognition.detectLabels(bucketName, keyName).then(labels => {
+                                if (labels.Labels) {
+                                    /* Check the labels with the food database */
+                                    foodDetection.parseLabelDataForFood(labels.Labels)
+                                        .then(result => {
+                                            console.log(result)
+                                            res.send(result);
+                                        })
+                                        .catch(err => {
+                                            console.error(err);
+                                            res.sendStatus(500);
+                                        });
+                                } else {
+                                    res.sendStatus(500);
+                                }
+                            });
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            res.sendStatus(500);
+                        })
+                });
+        });
+        /*********************************** END DETECT CALORIES ***************************************/
+
+
+        /* Listen to the App Engine-specified port, or 8080 otherwise */
+        server.listen(PORT, (err) => {
+            if (err) throw err
+            console.log(`> Ready on http://localhost:${PORT}`);
+        })
+    })
+    .catch((ex) => {
+        console.error(ex);
+        process.exit(1);
+    });
