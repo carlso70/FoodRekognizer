@@ -12,17 +12,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.387.0",
+    "aws-sdk": "^2.397.0",
     "body-parser": "^1.18.3",
     "cloudconvert": "^1.1.2",
     "cors": "^2.8.5",
     "express": "^4.16.4",
+    "helmet": "^3.15.0",
     "mime": "^2.4.0",
     "multer": "^1.4.1",
     "next": "^7.0.2",
     "node-fetch": "^2.3.0",
-    "react": "^16.8.0",
-    "react-dom": "^16.8.0",
+    "react": "^16.8.1",
+    "react-dom": "^16.8.1",
     "uuid": "^3.3.2"
   }
 }
