@@ -1,9 +1,8 @@
-const url = require('url'),
-    EDAMAM_KEY = process.env.EDAMAM_KEY,
+const EDAMAM_KEY = process.env.EDAMAM_KEY,
     EDAMAM_APP_ID = process.env.EDAMAM_APP_ID,
     querystring = require('querystring'),
-    util = require('util')
-fetch = require("node-fetch");
+    util = require('util'),
+    fetch = require("node-fetch");
 
 module.exports = {
     parseLabelDataForFood: (labelData) => {
@@ -14,9 +13,21 @@ module.exports = {
             promises.push(checkFoodDatabase(label.Name));
         }
 
-        Promise.all(promises).then(res => {
-            console.log(util.inspect(res, { showHidden: false, depth: null }));
-            
+        return new Promise((resolve, reject) => {
+            Promise.all(promises).then(foodData => {
+                // console.log(util.inspect(res, { showHidden: false, depth: null }));
+                let result = []
+
+                /* Go through results and add valid food responses */
+                for (const food of foodData) {
+                    for (const hint of food.hints) {
+                        if (hint.food.label && hint.food.nutrients) {
+                            result.push(hint);
+                        }
+                    }
+                }
+                resolve(result);
+            }).catch(err => reject(err));
         });
     }
 };
@@ -32,7 +43,6 @@ function checkFoodDatabase(food) {
     }
     /* https://api.edamam.com/api/food-database/parser?nutrition-type=logging&ingr=red%20apple&app_id={your app_id}&app_key={your app_key} */
     const endpoint = `https://api.edamam.com/api/food-database/parser?` + querystring.stringify(params);
-    console.log(`endpoint: ${endpoint}`);
 
     return new Promise((resolve, reject) => {
         fetch(endpoint)
