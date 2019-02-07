@@ -115,4 +115,5 @@ router.post('/detectCalories', upload.single('photo'), (req, res) => {
 });
 /*********************************** END DETECT CALORIES ***************************************/
 
+/* Export the controllers */
 module.exports = router;

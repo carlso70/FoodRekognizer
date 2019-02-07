@@ -16,9 +16,11 @@ app.prepare()
         server.use(cors({ credentials: true, origin: true }));
         server.use(bodyParser.urlencoded({ extended: true }));
         server.use(bodyParser.json());
-        
+
+        /* Endpoints used for processing photo uploads, and detection */
         server.use('/api', api);
 
+        /* UI Endpoints */
         server.get('*', (req, res) => {
             return handle(req, res)
         });
@@ -29,7 +31,7 @@ app.prepare()
         server.listen(PORT, (err) => {
             if (err) throw err
             console.log(`> Ready on http://localhost:${PORT}`);
-        })
+        });
     })
     .catch((ex) => {
         console.error(ex);
