@@ -1,46 +1,37 @@
 import React from 'react'
-import { Grid, Header, Segment, Icon, Button, GridRow, Form } from 'semantic-ui-react'
-const axios = require("axios");
+import { Card, Image, Grid, Header, Segment, Icon, Button, Placeholder } from 'semantic-ui-react'
+
 
 export default class PhotoUpload extends React.Component {
-    state = {}
-
-    onFormSubmit = (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append('photo', this.state.file);
-        const config = {
-            headers: {
-                'content-type': 'multipart/form-data'
-            }
-        };
-        axios.post("/api/detectPhotoLabels", formData, config)
-            .then((response) => {
-                console.log(response);
-                alert("The file is successfully uploaded");
-            }).catch((error) => {
-                console.error(error);
-            });
-    }
-
-    onChange = (e) => {
-        this.setState({ file: e.target.files[0] });
-    }
-
     render() {
+        console.log(this.props.image)
+        let imageComponent;
+        if (this.props.image) {
+            imageComponent = <Image src={URL.createObjectURL(this.props.image)} style={{ 'height': '25vh' }}/>
+        } else {
+            imageComponent = (<Placeholder style={{ 'height': '25vh' }} >
+                <Placeholder.Image square />
+            </Placeholder>);
+        }
+
         return (
-            <Segment style={{ 'height': '75vh' }} textAlign="center">
-                <div>
-                    <form onSubmit={this.onFormSubmit}>
-                        <label htmlFor='myInput'>
-                            <input id="myInput" onChange={this.onChange} type="file" />
-                        </label>
-                        <Button >
-                            Upload Photo
+            <Card style={{'width' :'50vh'}}>
+                {imageComponent}
+                <Card.Content>
+                    <Card.Header>Detect Calories</Card.Header>
+                    <div>
+                        <form onSubmit={this.props.onPhotoSubmit}>
+                            <label htmlFor='myInput'>
+                                <input id="myInput" onChange={this.props.onPhotoChange} type="file" />
+                            </label>
+                            <Button >
+                                Upload Photo
                         </Button>
-                    </form>
-                </div>
-            </Segment>
+                        </form>
+                    </div>
+
+                </Card.Content>
+            </Card>
         );
     }
 }
