@@ -1,13 +1,14 @@
 import Header from './Header';
-
-const layoutStyle = {
-    margin: 20,
-    padding: 20,
-    border: '1px solid #DDD'
-}
+import Head from "next/head";
 
 const Layout = (props) => (
-    <div style={layoutStyle}>
+    <div>
+        <Head>
+            <link
+                rel="stylesheet"
+                href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.11/semantic.min.css"
+            />
+        </Head>
         <Header />
         {props.children}
     </div>

@@ -1,18 +1,35 @@
 import Link from 'next/link'
+import React, { Component } from 'react'
+import { Menu } from 'semantic-ui-react'
 
-const linkStyle = {
-    marginRight: 15
-}
+export default class Header extends Component {
+    state = {}
 
-const Header = () => (
-    <div>
-        <Link href="/">
-            <a style={linkStyle}>Home</a>
-        </Link>
-        <Link href="/about">
-            <a style={linkStyle}>About</a>
-        </Link>
-    </div>
-)
+    handleClick = (name) => this.setState({ activeItem: name });
 
-export default Header
+    render() {
+        const { activeItem } = this.state
+
+        return (
+            <Menu>
+                <Link href="/" >
+                <Menu.Item header>Food Rekognizer</Menu.Item>
+                </Link>
+                <Link href="/foodDetection">
+                    <Menu.Item
+                        name='Detect Food'
+                        active={activeItem === 'Home'}
+                        onClick={() => this.handleClick('Home')}
+                    />
+                </Link>
+                <Link href="/about" >
+                    <Menu.Item
+                        name='About'
+                        active={activeItem === 'About'}
+                        onClick={() => this.handleClick('About')}
+                    />
+                </Link>
+            </Menu>
+        )
+    }
+};

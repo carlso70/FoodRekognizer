@@ -12,8 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@material-ui/core": "^3.9.2",
+    "@zeit/next-css": "^1.0.1",
     "aws-sdk": "^2.397.0",
+    "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "cloudconvert": "^1.1.2",
     "cors": "^2.8.5",
@@ -25,6 +26,7 @@
     "node-fetch": "^2.3.0",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
+    "semantic-ui-react": "^0.85.0",
     "uuid": "^3.3.2"
   }
 }
