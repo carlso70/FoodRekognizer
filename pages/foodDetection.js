@@ -2,12 +2,17 @@ import { withRouter } from 'next/router';
 import Layout from '../components/MyLayout.js';
 import PhotoUpload from '../components/PhotoUpload.js';
 import React from 'react';
-import { Container } from 'semantic-ui-react';
+import {
+    Container,
+    Segment,
+    Divider
+} from 'semantic-ui-react';
 import axios from 'axios';
 
 class Page extends React.Component {
     state = {
-        file: null
+        file: null,
+        progress: 'none' /* Progress values: none, active, failed, complete */
     }
 
     onPhotoSubmit = (e) => {
@@ -19,13 +24,16 @@ class Page extends React.Component {
                 'content-type': 'multipart/form-data'
             }
         };
-        axios.post("/api/detectPhotoLabels", formData, config)
-            .then((response) => {
-                console.log(response);
-                alert("The file is successfully uploaded");
-            }).catch((error) => {
-                console.error(error);
-            });
+        this.setState({ progress: 'active' }, () => {
+            axios.post("/api/detectCalories", formData, config)
+                .then((response) => {
+                    console.log(response);
+                    this.setState({ progress: 'complete' });
+                }).catch((error) => {
+                    console.error(error);
+                    this.setState({ progress: 'failed' });
+                });
+        });
     }
 
     onPhotoChange = (e) => {
@@ -35,8 +43,14 @@ class Page extends React.Component {
     render() {
         return (
             <Layout>
-                <Container >
-                    <PhotoUpload image={this.state.file} onPhotoSubmit={this.onPhotoSubmit} onPhotoChange={this.onPhotoChange} />
+                <Container>
+                    <PhotoUpload
+                        imageHeight={'75vh'}
+                        image={this.state.file}
+                        onPhotoSubmit={this.onPhotoSubmit}
+                        onPhotoChange={this.onPhotoChange}
+                        progress={this.state.progress}
+                    />
                 </Container>
             </Layout>
         );
