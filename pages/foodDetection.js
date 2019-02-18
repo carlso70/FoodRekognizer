@@ -43,7 +43,7 @@ class Page extends React.Component {
     render() {
         return (
             <Layout>
-                <Container>
+                <Segment>
                     <PhotoUpload
                         imageHeight={'75vh'}
                         image={this.state.file}
@@ -51,7 +51,8 @@ class Page extends React.Component {
                         onPhotoChange={this.onPhotoChange}
                         progress={this.state.progress}
                     />
-                </Container>
+                    <Divider horizontal />
+                </Segment>
             </Layout>
         );
     }

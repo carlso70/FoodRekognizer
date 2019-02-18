@@ -1,6 +1,7 @@
 const s3 = require('./AWS/s3.js'),
     rekognition = require('./AWS/rekognition.js'),
     foodDetection = require('./FoodDetection/foodDetection.js'),
+    nutritionEstimator = require('./FoodDetection/nutritionEstimator.js'),
     photoUtils = require('./Utils/photoUtils.js'),
     express = require('express'),
     crypto = require('crypto'),
@@ -114,6 +115,51 @@ router.post('/detectCalories', upload.single('photo'), (req, res) => {
         });
 });
 /*********************************** END DETECT CALORIES ***************************************/
+
+/*********************************** DETECT NUTRITION ***************************************/
+/* 
+ * DETECT NUTRITION - upload a picture, process it to s3, check labels using rekognition,
+ * then check for food and detect potential calories
+ */
+router.post('/detectNutrition', upload.single('photo'), (req, res) => {
+    /* Convert given photo */
+    photoUtils.convertHEICtoPNG(req.file.path)
+        .then(outputFile => {
+            console.log(`Converted file: ${outputFile}`);
+
+            /* Upload converted png to s3 bucket */
+            s3.uploadPhotoToBucket(bucketName, req.file.originalname, outputFile)
+                .then(keyName => {
+                    console.log(`File uploaded: ${keyName}`);
+                    /* TODO Delete photo from local file system */
+
+                    /* Detect the labels of the photo */
+                    rekognition.detectLabels(bucketName, keyName).then(labels => {
+                        if (labels.Labels) {
+                            /* Check the labels with the food database */
+                            nutritionEstimator.parseNutritionFromLabels(labels.Labels)
+                                .then(result => {
+                                    console.log(result)
+                                    res.send(result);
+                                })
+                                .catch(err => {
+                                    console.error(err);
+                                    res.sendStatus(500);
+                                });
+                        } else {
+                            res.sendStatus(500);
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    res.sendStatus(500);
+                });
+        });
+});
+
+/*********************************** END DETECT NUTRITION ***************************************/
+
 
 /* Export the controllers */
 module.exports = router;
