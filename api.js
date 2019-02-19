@@ -139,6 +139,7 @@ router.post('/detectNutrition', upload.single('photo'), (req, res) => {
                             /* Check the labels with the food database */
                             nutritionEstimator.parseNutritionFromLabels(labels.Labels)
                                 .then(result => {
+                                    console.log("DETECTED NUTRITION")
                                     console.log(result)
                                     res.send(result);
                                 })

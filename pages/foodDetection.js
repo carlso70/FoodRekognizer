@@ -25,7 +25,7 @@ class Page extends React.Component {
             }
         };
         this.setState({ progress: 'active' }, () => {
-            axios.post("/api/detectCalories", formData, config)
+            axios.post("/api/detectNutrition", formData, config)
                 .then((response) => {
                     console.log(response);
                     this.setState({ progress: 'complete' });

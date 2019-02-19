@@ -1,9 +1,9 @@
 import React from 'react'
 import { Card, Image, Progress, Button, Placeholder } from 'semantic-ui-react'
 
-
 export default class PhotoUpload extends React.Component {
 
+    /* getImageComponent: using the props, set the image inside the card to a placeholder or image */
     getImageComponent = () => {
         if (this.props.image) {
             return <Image src={URL.createObjectURL(this.props.image)} style={{ 'height': this.props.imageHeight }} />
@@ -14,6 +14,7 @@ export default class PhotoUpload extends React.Component {
         }
     }
 
+    /* getProgressComponent: setup the progress bar component based off the progress prop */
     getProgressComponent = () => {
         if (this.props.progress) {
             switch (this.props.progress) {
@@ -38,13 +39,10 @@ export default class PhotoUpload extends React.Component {
                 <Card.Content>
                     {this.getProgressComponent()}
                     <Card.Header>Detect Nutrition</Card.Header>
-                    <div>
-                        <form onSubmit={this.props.onPhotoSubmit}>
-                            <input id="myInput" onChange={this.props.onPhotoChange} type="file" />
-                            {this.props.progress === 'waiting' && <Button content="Upload Photo" />}
-                        </form>
-                    </div>
-
+                    <form onSubmit={this.props.onPhotoSubmit}>
+                        <input id="myInput" onChange={this.props.onPhotoChange} type="file" />
+                        {this.props.progress === 'waiting' && <Button content="Upload Photo" />}
+                    </form>
                 </Card.Content>
             </Card>
         );
