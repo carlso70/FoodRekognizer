@@ -12,7 +12,7 @@ import axios from 'axios';
 class Page extends React.Component {
     state = {
         file: null,
-        progress: 'none' /* Progress values: none, active, failed, complete */
+        progress: '' /* Progress values: waiting, active, failed, complete */
     }
 
     onPhotoSubmit = (e) => {
@@ -37,13 +37,16 @@ class Page extends React.Component {
     }
 
     onPhotoChange = (e) => {
-        this.setState({ file: e.target.files[0] });
+        this.setState({ 
+            file: e.target.files[0],
+            progress: 'waiting'
+         });
     }
 
     render() {
         return (
             <Layout>
-                <Segment>
+                <Segment placeholder>
                     <PhotoUpload
                         imageHeight={'75vh'}
                         image={this.state.file}

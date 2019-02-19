@@ -7,7 +7,8 @@
     "dev": "node server.js",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
-    "clean": "node Utils/cleanout.js"
+    "clean": "node Utils/cleanout.js",
+    "s3clean": "node Utils/S3Cleanout.js"
   },
   "author": "",
   "license": "ISC",

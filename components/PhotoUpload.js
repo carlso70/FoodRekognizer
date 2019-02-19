@@ -3,43 +3,45 @@ import { Card, Image, Progress, Button, Placeholder } from 'semantic-ui-react'
 
 
 export default class PhotoUpload extends React.Component {
-    render() {
-        let imageComponent;
+
+    getImageComponent = () => {
         if (this.props.image) {
-            imageComponent = <Image src={URL.createObjectURL(this.props.image)} style={{ 'height': this.props.imageHeight }} />
+            return <Image src={URL.createObjectURL(this.props.image)} style={{ 'height': this.props.imageHeight }} />
         } else {
-            imageComponent = (<Placeholder style={{ 'height': this.props.imageHeight }}>
+            return (<Placeholder style={{ 'height': this.props.imageHeight }}>
                 <Placeholder.Image square />
             </Placeholder>);
         }
+    }
 
-        let progressBar;
+    getProgressComponent = () => {
         if (this.props.progress) {
             switch (this.props.progress) {
                 case 'active':
-                    progressBar = (<Progress percent={50} active>Uploading....</Progress>);
-                    break;
+                    return <Progress percent={100} active>Uploading....</Progress>;
                 case 'complete':
-                    progressBar = (<Progress percent={100} success>Completed!</Progress>);
-                    break;
+                    return <Progress percent={100} success>Completed!</Progress>;
                 case 'failed':
-                    progressBar = (<Progress percent={100} error>Uh oh...looks like there was an error</Progress>);
-                    break;
+                    return <Progress percent={100} error>Uh oh...looks like there was an error</Progress>;
+                case 'waiting':
+                    return <Progress percent={0}>Ready to upload</Progress>
+                default:
+                    return
             }
         }
+    }
 
+    render() {
         return (
             <Card fluid centered>
-                {imageComponent}
+                {this.getImageComponent()}
                 <Card.Content>
-                    <Card.Header>Detect Calories</Card.Header>
-                    {progressBar}
+                    {this.getProgressComponent()}
+                    <Card.Header>Detect Nutrition</Card.Header>
                     <div>
                         <form onSubmit={this.props.onPhotoSubmit}>
-                            <label htmlFor='myInput'>
-                                <input id="myInput" onChange={this.props.onPhotoChange} type="file" />
-                            </label>
-                            <Button content="Upload Photo" />
+                            <input id="myInput" onChange={this.props.onPhotoChange} type="file" />
+                            {this.props.progress === 'waiting' && <Button content="Upload Photo" />}
                         </form>
                     </div>
 

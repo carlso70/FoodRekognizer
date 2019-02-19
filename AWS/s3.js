@@ -69,6 +69,7 @@ module.exports = {
 		});
 
 		await s3.deleteObjects(deleteParams).promise();
+		console.log(`Deleted objects ${deleteParams.Delete.Objects} from ${deleteParams.bucket}`);
 
 		if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
 	},
