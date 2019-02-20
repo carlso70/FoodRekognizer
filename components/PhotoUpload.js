@@ -1,6 +1,10 @@
 import React from 'react'
 import { Card, Image, Progress, Button, Placeholder } from 'semantic-ui-react'
 
+const cardStyle = {
+    'padding': '2vh'
+}
+
 export default class PhotoUpload extends React.Component {
 
     /* getImageComponent: using the props, set the image inside the card to a placeholder or image */
@@ -34,11 +38,11 @@ export default class PhotoUpload extends React.Component {
 
     render() {
         return (
-            <Card fluid centered>
+            <Card fluid centered style={cardStyle}>
                 {this.getImageComponent()}
                 <Card.Content>
                     {this.getProgressComponent()}
-                    <Card.Header>Detect Nutrition</Card.Header>
+                    <Card.Header>Detect Food</Card.Header>
                     <form onSubmit={this.props.onPhotoSubmit}>
                         <input id="myInput" onChange={this.props.onPhotoChange} type="file" />
                         {this.props.progress === 'waiting' && <Button content="Upload Photo" />}

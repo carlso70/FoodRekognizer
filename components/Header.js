@@ -15,7 +15,7 @@ export default class Header extends Component {
                 <Link href="/" >
                 <Menu.Item header>Food Rekognizer</Menu.Item>
                 </Link>
-                <Link href="/foodDetection">
+                <Link href="/detectFood">
                     <Menu.Item
                         name='Detect Food'
                         active={activeItem === 'Home'}

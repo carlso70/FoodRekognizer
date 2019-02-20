@@ -3,7 +3,6 @@ import Layout from '../components/MyLayout.js';
 import PhotoUpload from '../components/PhotoUpload.js';
 import React from 'react';
 import {
-    Container,
     Segment,
     Divider
 } from 'semantic-ui-react';
@@ -37,25 +36,22 @@ class Page extends React.Component {
     }
 
     onPhotoChange = (e) => {
-        this.setState({ 
+        this.setState({
             file: e.target.files[0],
             progress: 'waiting'
-         });
+        });
     }
 
     render() {
         return (
             <Layout>
-                <Segment placeholder>
-                    <PhotoUpload
-                        imageHeight={'75vh'}
-                        image={this.state.file}
-                        onPhotoSubmit={this.onPhotoSubmit}
-                        onPhotoChange={this.onPhotoChange}
-                        progress={this.state.progress}
-                    />
-                    <Divider horizontal />
-                </Segment>
+                <PhotoUpload
+                    imageHeight={'75vh'}
+                    image={this.state.file}
+                    onPhotoSubmit={this.onPhotoSubmit}
+                    onPhotoChange={this.onPhotoChange}
+                    progress={this.state.progress}
+                />
             </Layout>
         );
     }
