@@ -1,5 +1,6 @@
 import Header from './Header';
 import Head from "next/head";
+import '../styles/styling.css'
 
 const Layout = (props) => (
     <div>
