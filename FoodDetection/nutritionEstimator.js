@@ -15,8 +15,8 @@ module.exports = {
                 let result = []
                 for (const item of foodData) {
                     /* Valid results come back with the foods object */
-                    if (item.foods !== undefined) {
-                        result.concat(item.foods);
+                    if (Array.isArray(item.foods)) {
+                        result.push.apply(result, item.foods);
                     }
                 }
                 resolve(result);

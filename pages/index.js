@@ -1,20 +1,24 @@
 import Layout from '../components/MyLayout';
-import Link from 'next/link';
 import { withRouter } from 'next/router';
 import React from 'react';
 import {
-    Button,
     Header,
     Icon,
     Grid
 } from "semantic-ui-react";
+import KetoResult from '../components/KetoResult';
 import PhotoUpload from '../components/PhotoUpload';
 import axios from 'axios';
+
+const style = {
+    'padding': '2vh'
+}
 
 class Index extends React.Component {
     state = {
         file: null,
-        progress: '' /* Progress values: waiting, active, failed, complete */
+        progress: '', /* Progress values: waiting, active, failed, complete */
+        result: { 'test': 'test' }
     }
 
     onPhotoSubmit = (e) => {
@@ -30,7 +34,10 @@ class Index extends React.Component {
             axios.post("/api/detectNutrition", formData, config)
                 .then((response) => {
                     console.log(response);
-                    this.setState({ progress: 'complete' });
+                    this.setState({
+                        progress: 'complete',
+                        result: response
+                    });
                 }).catch((error) => {
                     console.error(error);
                     this.setState({ progress: 'failed' });
@@ -45,10 +52,16 @@ class Index extends React.Component {
         });
     }
 
+    getKetoResultComponent = () => {
+        if (!isEmpty(this.state.result))
+            return <KetoResult result={this.state.result} />
+    }
+
     render() {
+        const result = this.state.result;
         return (
             <Layout>
-                <Grid>
+                <Grid style={style}>
                     <Grid.Row centered>
                         <div>
                             <Header as='h2' icon textAlign='center'>
@@ -58,7 +71,12 @@ class Index extends React.Component {
                         </div>
                     </Grid.Row>
                     <Grid.Row>
-                        <Grid.Column width={4} centered />
+                        <Grid.Column width={isEmpty(result) ? 4 : 8} centered>
+                            {!isEmpty(result) ?
+                                <KetoResult result={result} />
+                                : <div />
+                            }
+                        </Grid.Column>
                         <Grid.Column width={8} centered>
                             <PhotoUpload
                                 imageHeight={'45vh'}
@@ -68,11 +86,15 @@ class Index extends React.Component {
                                 progress={this.state.progress}
                             />
                         </Grid.Column>
-                        <Grid.Column width={4} centered />
                     </Grid.Row>
                 </Grid>
             </Layout>);
     }
+}
+
+function isEmpty(obj) {
+    console.log(obj)
+    return Object.entries(obj).length === 0 && obj.constructor === Object
 }
 
 export default withRouter(Index);
