@@ -18,7 +18,7 @@ class Index extends React.Component {
     state = {
         file: null,
         progress: '', /* Progress values: waiting, active, failed, complete */
-        result: { 'test': 'test' }
+        result: {}
     }
 
     onPhotoSubmit = (e) => {
@@ -33,10 +33,9 @@ class Index extends React.Component {
         this.setState({ progress: 'active' }, () => {
             axios.post("/api/detectNutrition", formData, config)
                 .then((response) => {
-                    console.log(response);
                     this.setState({
                         progress: 'complete',
-                        result: response
+                        result: response.data
                     });
                 }).catch((error) => {
                     console.error(error);
@@ -52,13 +51,7 @@ class Index extends React.Component {
         });
     }
 
-    getKetoResultComponent = () => {
-        if (!isEmpty(this.state.result))
-            return <KetoResult result={this.state.result} />
-    }
-
     render() {
-        const result = this.state.result;
         return (
             <Layout>
                 <Grid style={style}>
@@ -71,9 +64,9 @@ class Index extends React.Component {
                         </div>
                     </Grid.Row>
                     <Grid.Row>
-                        <Grid.Column width={isEmpty(result) ? 4 : 8} centered>
-                            {!isEmpty(result) ?
-                                <KetoResult result={result} />
+                        <Grid.Column width={isEmpty(this.state.result) ? 4 : 8} centered>
+                            {!isEmpty(this.state.result) ?
+                                <KetoResult result={this.state.result} />
                                 : <div />
                             }
                         </Grid.Column>

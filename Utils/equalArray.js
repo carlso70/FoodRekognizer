@@ -24,7 +24,7 @@ export default function equalArray(res1, res2) {
 
         /* If an object or array, compare recursively */
         if (['[object Array]', '[object Object]'].indexOf(itemType) >= 0) {
-            if (!isEqual(item1, item2)) return false;
+            if (!equalArray(item1, item2)) return false;
         } else {
             /* Otherwise, do a simple comparison */
 
@@ -44,16 +44,16 @@ export default function equalArray(res1, res2) {
     };
 
     /* Compare properties */
-    if (type === '[object Array]') {
-        for (var i = 0; i < valueLen; i++) {
-            if (compare(value[i], other[i]) === false) return false;
+    if (type1 === '[object Array]') {
+        for (var i = 0; i < res1; i++) {
+            if (compare(res1[i], res2[i]) === false) return false;
         }
     } else {
-        for (var key in value) {
-            if (value.hasOwnProperty(key)) {
-                if (compare(value[key], other[key]) === false) return false;
+        for (var key in res1) {
+            if (res1.hasOwnProperty(key)) {
+                if (compare(res1[key], res2[key]) === false) return false;
             }
         }
     }
-    return true
+    return true;
 }
