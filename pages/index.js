@@ -37,7 +37,7 @@ class Index extends React.Component {
                     this.setState({
                         progress: 'complete',
                         result: response.data
-                    });
+                    }, this.forceUpdate());
                 }).catch((error) => {
                     console.error(error);
                     this.setState({ progress: 'failed' });

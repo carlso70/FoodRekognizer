@@ -1,8 +1,8 @@
 import React from 'react'
 import {
-    Card,
     Tab,
-    Message,
+    Segment,
+    Statistic
 } from 'semantic-ui-react'
 import equalArray from '../Utils/equalArray.js';
 
@@ -19,32 +19,31 @@ export default class KetoResult extends React.Component {
         const nutrition = this.state.nutrition;
         return (
             <Tab.Pane>
-                <Message>
-                    <p>Calories: {nutrition[index].nf_calories}</p>
-                    <p>Carbs: {nutrition[index].nf_total_carbohydrate}</p>
-                    <p>Total Fat: {nutrition[index].nf_total_fat}</p>
-                    <p>Saturated Fat: {nutrition[index].nf_saturated_fat}</p>
-                    <p>Cholesterol: {nutrition[index].nf_cholesterol}</p>
-                    <p>Sodium: {nutrition[index].nf_sodium}</p>
-                    <p>Fiber: {nutrition[index].nf_dietary_fiber}</p>
-                    <p>Sugars: {nutrition[index].nf_sugars}</p>
-                    <p>Protein: {nutrition[index].nf_protein}</p>
-                    <p>Potassium: {nutrition[index].nf_potassium}</p>
-                </Message>
+                <h1>{nutrition[index].nf_total_carbohydrate > 20 ? 'Probably Not Keto' : 'Probably Keto'}</h1>
+                <Segment >
+                    <Statistic.Group widths="2" size="small" >
+                        <Statistic  label={"Calories"} value={nutrition[index].nf_calories} />
+                        <Statistic  label={"Carbs"} value={nutrition[index].nf_total_carbohydrate} />
+                        <Statistic  label={"Protein"} value={nutrition[index].nf_protein} />
+                        <Statistic  label={"Total Fat"} value={nutrition[index].nf_total_fat} />
+                        <Statistic  label={"Saturated Fat"} value={nutrition[index].nf_saturated_fat} />
+                        <Statistic  label={"Cholesterol"} value={nutrition[index].nf_cholesterol} />
+                        <Statistic  label={"Sodium"} value={nutrition[index].nf_sodium} />
+                        <Statistic  label={"Fiber"} value={nutrition[index].nf_dietary_fiber} />
+                        <Statistic  label={"Sugars"} value={nutrition[index].nf_sugars} />
+                        <Statistic  label={"Potassium"} value={nutrition[index].nf_potassium} />
+                    </Statistic.Group>
+                </Segment>
             </Tab.Pane>
         );
     }
 
     render() {
-
-        console.log("Nutrition Result");
         const nutrition = this.state.nutrition;
-        console.log(nutrition);
 
         /* Build panes */
         let panes = [];
         if (Array.isArray(nutrition)) {
-            console.log("is array");
             for (let i in nutrition) {
                 console.log(nutrition[i]);
                 let pane = {
