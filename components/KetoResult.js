@@ -1,7 +1,8 @@
 import React from 'react'
 import {
     Card,
-    Tab
+    Tab,
+    Message,
 } from 'semantic-ui-react'
 import equalArray from '../Utils/equalArray.js';
 
@@ -18,8 +19,18 @@ export default class KetoResult extends React.Component {
         const nutrition = this.state.nutrition;
         return (
             <Tab.Pane>
-                <p>Calories: {nutrition[index].nf_calories}</p>
-                <p>Carbs: {nutrition[index].nf_total_carbohydrate}</p>
+                <Message>
+                    <p>Calories: {nutrition[index].nf_calories}</p>
+                    <p>Carbs: {nutrition[index].nf_total_carbohydrate}</p>
+                    <p>Total Fat: {nutrition[index].nf_total_fat}</p>
+                    <p>Saturated Fat: {nutrition[index].nf_saturated_fat}</p>
+                    <p>Cholesterol: {nutrition[index].nf_cholesterol}</p>
+                    <p>Sodium: {nutrition[index].nf_sodium}</p>
+                    <p>Fiber: {nutrition[index].nf_dietary_fiber}</p>
+                    <p>Sugars: {nutrition[index].nf_sugars}</p>
+                    <p>Protein: {nutrition[index].nf_protein}</p>
+                    <p>Potassium: {nutrition[index].nf_potassium}</p>
+                </Message>
             </Tab.Pane>
         );
     }
@@ -43,8 +54,6 @@ export default class KetoResult extends React.Component {
                 panes.push(pane);
             };
         }
-        
-
         return <Tab panes={panes} />
     }
 }
