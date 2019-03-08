@@ -80,8 +80,13 @@ typings/
 .dynamodb/
 
 # Photos uploaded
-uploads/* 
+uploads/*
 out.jpg
 
 # Annoying mac files
 .DS_Store
+
+# AWS pem files
+*.pem
+
+*.sh

@@ -7,6 +7,8 @@ const s3 = require('./AWS/s3.js'),
     crypto = require('crypto'),
     mime = require('mime'),
     multer = require('multer'),
+    fs = require('fs')
+    uploadsDir = './uploads', /* Local directory where uploads are stored before uploading to s3 */
     router = express.Router();
 
 /* 
@@ -24,12 +26,17 @@ s3.getFoodBucket().then(result => {
     process.exit(1);
 });
 
+/*
+ * If the uploadsDir doesn't exist create it 
+ */
+!fs.existsSync(uploadsDir) && fs.mkdirSync(uploadsDir); 
+
 /* 
  * Define multer upload settings for multiform data (food photos) 
  */
 let storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, './uploads/')
+        cb(null, uploadsDir)
     },
     filename: (req, file, cb) => {
         crypto.pseudoRandomBytes(16, function (err, raw) {
