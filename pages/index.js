@@ -19,7 +19,8 @@ class Index extends React.Component {
     state = {
         file: null,
         progress: '', /* Progress values: waiting, active, failed, complete */
-        result: process.env.NODE_ENV === 'development' ? testObjects.nutritionResponse : {} /* Set to dummy response if dev  */
+        // result: process.env.NODE_ENV === 'development' ? testObjects.nutritionResponse : {} /* Set to dummy response if dev  */
+        result: {}
     }
 
     onPhotoSubmit = (e) => {
@@ -65,13 +66,13 @@ class Index extends React.Component {
                         </div>
                     </Grid.Row>
                     <Grid.Row>
-                        <Grid.Column width={isEmpty(this.state.result) ? 4 : 8} centered>
+                        <Grid.Column width={isEmpty(this.state.result) ? 0 : 8} centered>
                             {!isEmpty(this.state.result) ?
                                 <KetoResult result={this.state.result} />
                                 : <div />
                             }
                         </Grid.Column>
-                        <Grid.Column width={8} centered>
+                        <Grid.Column width={isEmpty(this.state.result) ? 16 : 8} centered>
                             <PhotoUpload
                                 imageHeight={'45vh'}
                                 image={this.state.file}

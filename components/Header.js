@@ -15,13 +15,6 @@ export default class Header extends Component {
                 <Link href="/" >
                 <Menu.Item header>Food Rekognizer</Menu.Item>
                 </Link>
-                <Link href="/detectFood">
-                    <Menu.Item
-                        name='Detect Food'
-                        active={activeItem === 'Home'}
-                        onClick={() => this.handleClick('Home')}
-                    />
-                </Link>
                 <Link href="/about" >
                     <Menu.Item
                         name='About'

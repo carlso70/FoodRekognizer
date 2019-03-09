@@ -1,13 +1,12 @@
 const s3 = require('./AWS/s3.js'),
     rekognition = require('./AWS/rekognition.js'),
-    foodDetection = require('./FoodDetection/foodDetection.js'),
     nutritionEstimator = require('./FoodDetection/nutritionEstimator.js'),
     photoUtils = require('./Utils/photoUtils.js'),
     express = require('express'),
     crypto = require('crypto'),
     mime = require('mime'),
     multer = require('multer'),
-    fs = require('fs')
+    fs = require('fs'),
     uploadsDir = './uploads', /* Local directory where uploads are stored before uploading to s3 */
     router = express.Router();
 
@@ -18,10 +17,8 @@ const s3 = require('./AWS/s3.js'),
 let bucketName;
 s3.getFoodBucket().then(result => {
     bucketName = result;
-    console.log(`Bucketname: ${bucketName}`);
 }).catch(err => {
-    console.error(err);
-    console.error("NO S3 BUCKET TO RUN");
+    console.error("NO S3 BUCKET TO RUN", err);
     /* Kill the app because there is no s3 bucket to work with*/
     process.exit(1);
 });
@@ -29,7 +26,7 @@ s3.getFoodBucket().then(result => {
 /*
  * If the uploadsDir doesn't exist create it 
  */
-!fs.existsSync(uploadsDir) && fs.mkdirSync(uploadsDir); 
+!fs.existsSync(uploadsDir) && fs.mkdirSync(uploadsDir);
 
 /* 
  * Define multer upload settings for multiform data (food photos) 
@@ -82,49 +79,6 @@ router.post('/detectPhotoLabels', upload.single('photo'), (req, res) => {
 /**************************** END DETECT PHOTO LABELS *************************************/
 
 /* 
- * DETECT CALORIES - upload a picture, process it to s3, check labels using rekognition,
- * then check for food and detect potential calories
- */
-router.post('/detectCalories', upload.single('photo'), (req, res) => {
-    /* Convert given photo */
-    photoUtils.convertHEICtoPNG(req.file.path)
-        .then(outputFile => {
-            console.log(`Converted file: ${outputFile}`);
-
-            /* Upload converted png to s3 bucket */
-            s3.uploadPhotoToBucket(bucketName, req.file.originalname, outputFile)
-                .then(keyName => {
-                    console.log(`File uploaded: ${keyName}`);
-                    /* TODO Delete photo from local file system */
-
-                    /* Detect the labels of the photo */
-                    rekognition.detectLabels(bucketName, keyName).then(labels => {
-                        if (labels.Labels) {
-                            /* Check the labels with the food database */
-                            foodDetection.parseLabelDataForFood(labels.Labels)
-                                .then(result => {
-                                    console.log(result)
-                                    res.send(result);
-                                })
-                                .catch(err => {
-                                    console.error(err);
-                                    res.sendStatus(500);
-                                });
-                        } else {
-                            res.sendStatus(500);
-                        }
-                    });
-                })
-                .catch(err => {
-                    console.error(err);
-                    res.sendStatus(500);
-                })
-        });
-});
-/*********************************** END DETECT CALORIES ***************************************/
-
-/*********************************** DETECT NUTRITION ***************************************/
-/* 
  * DETECT NUTRITION - upload a picture, process it to s3, check labels using rekognition,
  * then check for food and detect potential calories
  */
@@ -165,9 +119,7 @@ router.post('/detectNutrition', upload.single('photo'), (req, res) => {
                 });
         });
 });
-
 /*********************************** END DETECT NUTRITION ***************************************/
-
 
 /* Export the controllers */
 module.exports = router;
