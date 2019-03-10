@@ -8,7 +8,7 @@ import {
 } from "semantic-ui-react";
 import KetoResult from '../components/KetoResult';
 import PhotoUpload from '../components/PhotoUpload';
-import testObjects from '../Utils/testObjects';
+import testObjects from '../Backend/Utils/testObjects';
 import axios from 'axios';
 
 const style = {
@@ -19,8 +19,7 @@ class Index extends React.Component {
     state = {
         file: null,
         progress: '', /* Progress values: waiting, active, failed, complete */
-        // result: process.env.NODE_ENV === 'development' ? testObjects.nutritionResponse : {} /* Set to dummy response if dev  */
-        result: {}
+        result: process.env.NODE_ENV === 'development' ? testObjects.nutritionResponse : {} /* Set to dummy response if dev  */
     }
 
     onPhotoSubmit = (e) => {

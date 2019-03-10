@@ -4,7 +4,7 @@ import {
     Segment,
     Statistic
 } from 'semantic-ui-react'
-import equalArray from '../Utils/equalArray.js';
+import equalArray from '../Backend/Utils/equalArray.js';
 
 export default class KetoResult extends React.Component {
     state = { nutrition: this.props.result }
